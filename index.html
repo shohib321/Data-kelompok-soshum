@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Data Kelompok Siswa Sosial Humaniora</title>
+
+<!-- Google Visualization API -->
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #4f46e5;
+        --primary-light: #eef2ff;
+        --secondary: #7c3aed;
+        --accent: #06b6d4;
+        --text-dark: #1f2937;
+        --text-light: #6b7280;
+        --bg-light: #f8fafc;
+        --bg-card: #ffffff;
+        --border: #e5e7eb;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --info: #3b82f6;
+        --danger: #ef4444;
+        --shadow: rgba(79, 70, 229, 0.1);
+        --shadow-dark: rgba(79, 70, 229, 0.15);
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        background: var(--bg-light);
+        color: var(--text-dark);
+        line-height: 1.6;
+        padding: 20px;
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    /* Header Styles */
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+    .header-content {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(79, 70, 229, 0.25);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 25px;
+    }
+
+    .header-content::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none" opacity="0.1"><path d="M0,0 L100,0 L100,100 Z" fill="white"/></svg>');
+        background-size: cover;
+    }
+
+    .header h1 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        font-size: 2.4rem;
+        margin-bottom: 8px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .header-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        max-width: 700px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stats-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 14px;
+        padding: 15px 20px;
+        min-width: 180px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+        z-index: 1;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    /* Search Box */
+    .search-container {
+        position: relative;
+        max-width: 700px;
+        margin: 0 auto 30px;
+    }
+
+    .search-box {
+        width: 100%;
+        padding: 18px 20px 18px 55px;
+        border: none;
+        border-radius: 16px;
+        background: var(--bg-card);
+        font-size: 1rem;
+        font-family: 'Inter', sans-serif;
+        box-shadow: 0 6px 20px var(--shadow);
+        transition: all 0.3s ease;
+        color: var(--text-dark);
+        border: 1px solid var(--border);
+    }
+
+    .search-box:focus {
+        outline: none;
+        box-shadow: 0 8px 25px var(--shadow-dark);
+        transform: translateY(-2px);
+        border-color: var(--primary);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary);
+        font-size: 1.2rem;
+        z-index: 2;
+    }
+
+    .search-hint {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-top: 8px;
+        padding-left: 10px;
+    }
+
+    /* Category Filter */
+    .category-filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 30px;
+        justify-content: center;
+    }
+
+    .category-btn {
+        padding: 10px 18px;
+        border-radius: 50px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        color: var(--text-dark);
+        font-family: 'Inter', sans-serif;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 3px 10px var(--shadow);
+    }
+
+    .category-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px var(--shadow);
+    }
+
+    .category-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .category-btn i {
+        font-size: 0.9rem;
+    }
+
+    /* Cards Container */
+    .card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+        margin-bottom: 50px;
+    }
+
+    .card {
+        background: var(--bg-card);
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 6px 20px var(--shadow);
+        border-left: 6px solid var(--primary);
+        transition: all 0.4s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--border);
+    }
+
+    .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px var(--shadow-dark);
+    }
+
+    .card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+
+    .card h3 {
+        margin: 0 0 15px;
+        color: var(--text-dark);
+        font-size: 1.4rem;
+        font-weight: 600;
+        line-height: 1.4;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .card-details {
+        margin-bottom: 20px;
+        flex-grow: 1;
+    }
+
+    .detail-item {
+        margin-bottom: 12px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .detail-item i {
+        color: var(--primary);
+        margin-right: 10px;
+        margin-top: 3px;
+        flex-shrink: 0;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-right: 5px;
+        min-width: 70px;
+    }
+
+    .detail-value {
+        color: var(--text-light);
+        line-height: 1.5;
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--primary-light);
+        color: var(--primary);
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-top: 5px;
+        align-self: flex-start;
+    }
+
+    /* Category Breakdown */
+    .category-breakdown {
+        background: var(--bg-card);
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 6px 20px var(--shadow);
+        margin-bottom: 40px;
+        border: 1px solid var(--border);
+    }
+
+    .section-title {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title i {
+        color: var(--primary);
+    }
+
+    .category-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .category-item {
+        background: var(--bg-light);
+        padding: 15px;
+        border-radius: 12px;
+        border-left: 4px solid var(--primary);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .category-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px var(--shadow);
+    }
+
+    .category-name {
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+
+    .category-count {
+        background: var(--primary);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    /* Footer */
+    .footer {
+        text-align: center;
+        padding: 25px;
+        color: var(--text-light);
+        font-size: 0.9rem;
+        border-top: 1px solid var(--border);
+        margin-top: 20px;
+    }
+
+    .footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    /* Empty State */
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 60px 20px;
+        background: var(--bg-card);
+        border-radius: 18px;
+        box-shadow: 0 6px 20px var(--shadow);
+        border: 1px solid var(--border);
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--primary-light);
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    .empty-state h3 {
+        color: var(--text-dark);
+        margin-bottom: 10px;
+        font-size: 1.5rem;
+    }
+
+    .empty-state p {
+        color: var(--text-light);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+        .card-container {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header h1 {
+            font-size: 2rem;
+        }
+        
+        .header-subtitle {
+            font-size: 1rem;
+        }
+        
+        .stat-card {
+            min-width: 150px;
+            padding: 12px 15px;
+        }
+        
+        .stat-value {
+            font-size: 1.7rem;
+        }
+        
+        .card-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .category-list {
+            grid-template-columns: 1fr;
+        }
+        
+        body {
+            padding: 15px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .header-content {
+            padding: 25px 15px;
+        }
+        
+        .header h1 {
+            font-size: 1.7rem;
+        }
+        
+        .stats-container {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-card {
+            width: 100%;
+            max-width: 250px;
+        }
+        
+        .search-box {
+            padding: 15px 15px 15px 50px;
+        }
+        
+        .category-filter {
+            justify-content: flex-start;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .category-btn {
+            white-space: nowrap;
+        }
+        
+        .card {
+            padding: 20px;
+        }
+        
+        .card h3 {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-content">
+            <h1><i class="fas fa-users"></i> Data Kelompok Siswa Sosial Humaniora</h1>
+            <p class="header-subtitle">Database lengkap kelompok penelitian siswa dalam bidang sosial dan humaniora</p>
+            
+            <div class="stats-container">
+                <div class="stat-card" id="totalGroups">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label">Total Kelompok</span>
+                </div>
+                <div class="stat-card" id="sociologyCount">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label">Sosiologi & Komunikasi</span>
+                </div>
+                <div class="stat-card" id="psychologyCount">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label">Psikologi & Pendidikan</span>
+                </div>
+                <div class="stat-card" id="economicsCount">
+                    <span class="stat-value">0</span>
+                    <span class="stat-label">Ekonomi & Manajemen</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Section -->
+    <div class="search-container">
+        <div class="search-icon"><i class="fas fa-search"></i></div>
+        <input type="text" class="search-box" id="searchInput" placeholder="Cari berdasarkan judul, ketua, anggota, atau kategori...">
+        <div class="search-hint">Tekan Enter untuk mencari atau gunakan filter kategori di bawah</div>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="category-filter">
+        <button class="category-btn active" data-category="all">
+            <i class="fas fa-layer-group"></i> Semua Kategori
+        </button>
+        <button class="category-btn" data-category="sosiologi">
+            <i class="fas fa-comments"></i> Sosiologi & Komunikasi
+        </button>
+        <button class="category-btn" data-category="psikologi">
+            <i class="fas fa-brain"></i> Psikologi & Pendidikan
+        </button>
+        <button class="category-btn" data-category="ekonomi">
+            <i class="fas fa-chart-line"></i> Ekonomi & Manajemen
+        </button>
+        <button class="category-btn" data-category="seni">
+            <i class="fas fa-palette"></i> Seni, Budaya & Sejarah
+        </button>
+        <button class="category-btn" data-category="bahasa">
+            <i class="fas fa-book-open"></i> Bahasa & Sastra
+        </button>
+    </div>
+
+    <!-- Category Breakdown -->
+    <div class="category-breakdown">
+        <h2 class="section-title"><i class="fas fa-chart-pie"></i> Jumlah Kelompok Berdasarkan Kategori</h2>
+        <div class="category-list" id="categoryList">
+            <!-- Category items will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Cards Container -->
+    <div class="card-container" id="dataContainer">
+        <!-- Cards will be inserted here by JavaScript -->
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>Database OPSI Sosial Humaniora • Data diperbarui dari Google Sheets • <a href="https://docs.google.com/spreadsheets/d/1YPD4iWjoDN59wKtCXFomwjAcIrAjGLWir8Ul-4imlpI" target="_blank">Lihat Sumber Data</a></p>
+    </footer>
+</div>
+
+<script>
+google.charts.load('current', {'packages':['table']});
+google.charts.setOnLoadCallback(loadData);
+
+let allData = [];
+let categoryCounts = {
+    'sosiologi': 0,
+    'psikologi': 0,
+    'ekonomi': 0,
+    'seni': 0,
+    'bahasa': 0,
+    'lainnya': 0
+};
+
+// Kategori mapping
+const categoryMapping = {
+    'sosiologi': ['sosiologi', 'komunikasi', 'rekayasa sosial', 'antropologi'],
+    'psikologi': ['psikologi', 'pendidikan'],
+    'ekonomi': ['ekonomi', 'manajemen'],
+    'seni': ['seni', 'budaya', 'sejarah'],
+    'bahasa': ['bahasa', 'sastra']
+};
+
+function loadData() {
+    const sheetID = '1YPD4iWjoDN59wKtCXFomwjAcIrAjGLWir8Ul-4imlpI';
+    const gid = '561455291';
+    const query = new google.visualization.Query(
+        `https://docs.google.com/spreadsheets/d/${sheetID}/gviz/tq?gid=${gid}`
+    );
+
+    query.send(handleQueryResponse);
+}
+
+function handleQueryResponse(response) {
+    if (response.isError()) {
+        showError();
+        return;
+    }
+
+    const data = response.getDataTable();
+    allData = [];
+    
+    // Reset counts
+    Object.keys(categoryCounts).forEach(key => categoryCounts[key] = 0);
+
+    for (let i = 0; i < data.getNumberOfRows(); i++) {
+        const ketua = data.getValue(i, 1) || "Tidak ada data";
+        const anggota = data.getValue(i, 2) || "Tidak ada data";
+        const kategori = data.getValue(i, 3) || "Lainnya";
+        const judul = data.getValue(i, 4) || "Tanpa judul";
+        
+        // Normalize category
+        const normalizedKategori = normalizeCategory(kategori);
+        
+        allData.push({
+            ketua: ketua.trim(),
+            anggota: anggota.trim(),
+            kategori: kategori.trim(),
+            judul: judul.trim(),
+            normalizedKategori: normalizedKategori,
+            searchText: `${ketua} ${anggota} ${kategori} ${judul}`.toLowerCase()
+        });
+        
+        // Update category count
+        categoryCounts[normalizedKategori]++;
+    }
+    
+    updateStatistics();
+    renderCategoryBreakdown();
+    renderCards(allData);
+}
+
+function normalizeCategory(category) {
+    const lowerCat = category.toLowerCase();
+    
+    for (const [key, keywords] of Object.entries(categoryMapping)) {
+        if (keywords.some(keyword => lowerCat.includes(keyword))) {
+            return key;
+        }
+    }
+    
+    return 'lainnya';
+}
+
+function updateStatistics() {
+    document.getElementById('totalGroups').querySelector('.stat-value').textContent = allData.length;
+    document.getElementById('sociologyCount').querySelector('.stat-value').textContent = categoryCounts.sosiologi;
+    document.getElementById('psychologyCount').querySelector('.stat-value').textContent = categoryCounts.psikologi;
+    document.getElementById('economicsCount').querySelector('.stat-value').textContent = categoryCounts.ekonomi;
+}
+
+function renderCategoryBreakdown() {
+    const categoryList = document.getElementById('categoryList');
+    const categories = [
+        { name: 'Sosiologi, Komunikasi dan Antropologi', key: 'sosiologi', icon: 'fas fa-comments' },
+        { name: 'Psikologi dan Pendidikan', key: 'psikologi', icon: 'fas fa-brain' },
+        { name: 'Ilmu Ekonomi dan Manajemen', key: 'ekonomi', icon: 'fas fa-chart-line' },
+        { name: 'Seni, Budaya, dan Sejarah', key: 'seni', icon: 'fas fa-palette' },
+        { name: 'Bahasa dan Sastra', key: 'bahasa', icon: 'fas fa-book-open' },
+        { name: 'Lainnya', key: 'lainnya', icon: 'fas fa-ellipsis-h' }
+    ];
+    
+    categoryList.innerHTML = categories.map(cat => `
+        <div class="category-item">
+            <div>
+                <div class="category-name"><i class="${cat.icon}"></i> ${cat.name}</div>
+            </div>
+            <div class="category-count">${categoryCounts[cat.key]}</div>
+        </div>
+    `).join('');
+}
+
+function renderCards(data) {
+    const container = document.getElementById('dataContainer');
+    
+    if (data.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <h3>Tidak ditemukan kelompok yang sesuai</h3>
+                <p>Coba gunakan kata kunci pencarian yang berbeda atau pilih kategori lain</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = '';
+    
+    data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        
+        // Get category icon
+        const categoryIcon = getCategoryIcon(item.normalizedKategori);
+        const categoryColor = getCategoryColor(item.normalizedKategori);
+        
+        card.innerHTML = `
+            <h3>${item.judul}</h3>
+            <div class="card-details">
+                <div class="detail-item">
+                    <i class="fas fa-user-circle"></i>
+                    <span class="detail-label">Ketua:</span>
+                    <span class="detail-value">${item.ketua}</span>
+                </div>
+                <div class="detail-item">
+                    <i class="fas fa-users"></i>
+                    <span class="detail-label">Anggota:</span>
+                    <span class="detail-value">${item.anggota}</span>
+                </div>
+            </div>
+            <div class="badge" style="background: ${categoryColor.background}; color: ${categoryColor.text};">
+                <i class="${categoryIcon}"></i>
+                ${item.kategori}
+            </div>
+        `;
+        
+        container.appendChild(card);
+    });
+}
+
+function getCategoryIcon(category) {
+    const icons = {
+        'sosiologi': 'fas fa-comments',
+        'psikologi': 'fas fa-brain',
+        'ekonomi': 'fas fa-chart-line',
+        'seni': 'fas fa-palette',
+        'bahasa': 'fas fa-book-open',
+        'lainnya': 'fas fa-ellipsis-h'
+    };
+    return icons[category] || 'fas fa-tag';
+}
+
+function getCategoryColor(category) {
+    const colors = {
+        'sosiologi': { background: '#e0f2fe', text: '#0369a1' },
+        'psikologi': { background: '#f0f9ff', text: '#0c4a6e' },
+        'ekonomi': { background: '#fef3c7', text: '#92400e' },
+        'seni': { background: '#fce7f3', text: '#9d174d' },
+        'bahasa': { background: '#dcfce7', text: '#166534' },
+        'lainnya': { background: '#f3f4f6', text: '#4b5563' }
+    };
+    return colors[category] || { background: '#f3f4f6', text: '#4b5563' };
+}
+
+function filterData() {
+    const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
+    const activeCategory = document.querySelector('.category-btn.active').dataset.category;
+    
+    let filtered = allData;
+    
+    // Apply category filter
+    if (activeCategory !== 'all') {
+        filtered = filtered.filter(item => item.normalizedKategori === activeCategory);
+    }
+    
+    // Apply search filter
+    if (searchKeyword.trim() !== '') {
+        filtered = filtered.filter(item => 
+            item.searchText.includes(searchKeyword)
+        );
+    }
+    
+    renderCards(filtered);
+}
+
+function showError() {
+    const container = document.getElementById('dataContainer');
+    container.innerHTML = `
+        <div class="empty-state">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Gagal memuat data</h3>
+            <p>Pastikan koneksi internet Anda stabil dan coba lagi nanti.</p>
+            <button onclick="loadData()" style="margin-top: 20px; padding: 12px 24px; background: var(--primary); color: white; border: none; border-radius: 10px; font-family: 'Inter', sans-serif; font-weight: 500; cursor: pointer;">
+                <i class="fas fa-redo"></i> Muat Ulang Data
+            </button>
+        </div>
+    `;
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Search input event
+    document.getElementById('searchInput').addEventListener('input', filterData);
+    
+    // Category filter events
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            filterData();
+        });
+    });
+    
+    // Enter key for search
+    document.getElementById('searchInput').addEventListener('keyup', function(event) {
+        if (event.key === "Enter") {
+            filterData();
+        }
+    });
+});
+</script>
+
+</body>
+</html>
